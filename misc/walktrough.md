@@ -1,26 +1,3 @@
-# Feb 18th
-
-Problem formulation
--
-
-(Refer to the repository "OneOpto")
-
-# Mar 4th
-
-Github
-- 
-
-(Refer to internal Vanguard github sync'ed with our repositories)
-
-Problem formulation
--
-
-(Refer to the repository "OneOpto")
-
-
-Algorithm selection
--
-
 
 - Selected the algorithm based on the problem characteristics and on the prototyping objectives.
 - Coded an end-to-end workflow (Qiskit patterns):
@@ -57,8 +34,6 @@ Material covered:
 > You may have noticed that some files are included in the `src/sbo/src` folder, while other are directly in `src`. The former is (an extract of) another more industrialized repo, whereas in the latter contains developments for the project that either are problem-specific or not yet integrated in the overall repo.
 
 
-Mar 18th
--
 
 - Simulator experiments
   - 31 qubits
@@ -81,8 +56,6 @@ Material covered:
 
 
 
-Apr 1st
--
 
 - Qiskit code assistant
 - Quantum serverless
@@ -235,8 +208,7 @@ wrapt                                   | 1.17.0
 yarl                                    | 1.18.3
 zipp                                    | 3.19.1
 
-Apr 29th
--
+
 
 - Comparison between simulator and hardware, on 31 and 109 bonds.
 
