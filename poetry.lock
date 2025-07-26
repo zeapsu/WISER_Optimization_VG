@@ -631,6 +631,19 @@ files = [
 ]
 
 [[package]]
+name = "docplex"
+version = "2.30.251"
+description = "The IBM Decision Optimization CPLEX Modeling for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "docplex-2.30.251.tar.gz", hash = "sha256:6503219f5b51275a7e4e77ca4332903b0f80925d205030a48d3f6aa7ca0dbf2a"},
+]
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 name = "executing"
 version = "2.2.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -3714,4 +3727,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a4ffed619f2c761602f1c2b9c5441bc5bffbb1aac009c8e046b1c4262c91728c"
+content-hash = "e4661c83c81fbf6e828355bc11626d04e3885a1ce2fa80a28b9902b0babfac5c"
