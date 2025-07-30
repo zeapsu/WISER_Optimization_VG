@@ -113,7 +113,12 @@ widgetsnbextension = "^4.0.14"
 wrapt = "^1.17.2"
 yarl = "^1.20.1"
 docplex = "^2.30.251"
+qiskit-aer = "^0.17.1"
+seaborn = "^0.13.2"
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.30.0"
 
 [build-system]
 requires = ["poetry-core"]
