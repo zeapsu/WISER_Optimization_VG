@@ -193,5 +193,5 @@ if __name__ == '__main__':
     #     if exp['device'] != 'AerSimulator':
     #         continue
     #     execute_multiple_runs(**exp, instance='', run_on_serverless=False)
-    execute_multiple_runs(**doe['1/31bonds/bfcdR3rep_piby3_AerSimulator_0.2'], instance='', run_on_serverless=False)
+    execute_multiple_runs(**doe['1/31bonds/bfcd3rep_piby3_AerSimulator_0.2'], instance='', run_on_serverless=False) #check doe.py for other experiments, also fixed typo
 

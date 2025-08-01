@@ -7,7 +7,7 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.11,<4.0" 
 aiobotocore = "^2.15.2"
 aiohappyeyeballs = "^2.4.4"
 aiohttp = "^3.11.10"
@@ -83,9 +83,9 @@ pyspnego = "^0.11.2"
 python-dateutil = "^2.9.0.post0"
 pytz = "^2024.2"
 pyyaml = "^6.0.2"
-qiskit = "^1.3.1"
+qiskit = "1.3.1"
 qiskit-ibm-runtime = "^0.34.0"
-qiskit-serverless = "<0.18"
+qiskit-serverless = "0.18.1"
 ray = "^2.34.0"
 referencing = "^0.35.0"
 requests = "^2.32.3"
@@ -120,6 +120,8 @@ docplex = "^2.30.251"
 qiskit-aer = "^0.17.1"
 seaborn = "^0.13.2"
 qiskit-optimization = { extras = ["cplex"], version = "^0.6.1" }
+qiskit-ibm-catalog = "0.2.0"
+numba = "^0.61.2"
 
 
 [tool.poetry.group.dev.dependencies]
