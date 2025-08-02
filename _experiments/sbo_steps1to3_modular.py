@@ -1,5 +1,6 @@
 import pickle as pkl
 import time
+import re
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from pathlib import Path
 from qiskit import qpy
@@ -235,23 +236,84 @@ def execute_multiple_runs(lp_file: str, experiment_id: str, num_exec: int, ansat
         # step 4 is deferred to another script
 
 
-if __name__ == '__main__':
+def auto_resume(experiment_dir: Path):
+    """
+    Infers the most recent unfinished experiment run and last iteration checkpoint.
+
+    Args:
+        experiment_dir: Path to the experiment folder (contains exp0.pkl, 3_85.pkl, etc.)
+
+    Returns:
+        partial_file: Path to exp{i}.pkl (may or may not exist)
+        exp_run: Integer run index i
+        last_iter: Integer iteration number j
+
+    Raises:
+        RuntimeError: If no incomplete run or iteration files found.
+    """
+
+    # step 1: find all final exp{i}.pkl files
+    final_files = sorted(f for f in experiment_dir.glob("exp*.pkl") if '_' not in f.name)
+    completed_runs = {int(f.stem[3:]) for f in final_files}
+
+    # step 2: find all iteration files: {i}_{j}.pkl
+    iter_files = sorted(f for f in experiment_dir.glob("*_*.pkl"))
+    iter_runs = {}
+    for f in iter_files:
+        try:
+            i, j = map(int, f.stem.split("_"))
+            if i not in iter_runs or j > iter_runs[i]:
+                iter_runs[i] = j
+        except ValueError:
+            continue  # skip malformed filenames
+
+    # step 3: pick the highest i such that exp{i}.pkl is missing but i_*.pkl exists
+    incomplete_runs = [i for i in iter_runs.keys() if i not in completed_runs]
+    if not incomplete_runs:
+        raise RuntimeError("No incomplete experiments found (all exp{i}.pkl files are present).")
+
+    exp_run = max(incomplete_runs)  # or min(...) to resume earliest unfinished run
+    last_iter = iter_runs[exp_run]
+
+    partial_file = experiment_dir / f"exp{exp_run}.pkl"
+    return partial_file, exp_run, last_iter
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run quantum optimization experiments.")
     parser.add_argument("--experiment", type=str, help="Key from the `doe` dictionary to run.")
+    parser.add_argument("--resume", action="store_true", help="Resume an incomplete experiment.")
     parser.add_argument("--list", action="store_true", help="List all available experiments and exit.")
     args = parser.parse_args()
+
     if args.list:
         print("Available experiments:")
         for key in sorted(doe.keys()):
             print(f" - {key}")
         exit(0)
 
-    if args.experiment:
-        if args.experiment not in doe:
-            print(f"Error: Experiment key '{args.experiment}' not found.")
-            print("Use --list to see available keys.")
-            exit(1)
-
-        execute_multiple_runs(**doe[args.experiment], instance="", run_on_serverless=False)
-    else:
+    if not args.experiment:
         print("No experiment provided. Use --experiment <key> or --list.")
+        exit(1)
+
+    if args.experiment not in doe:
+        print(f"Error: Experiment key '{args.experiment}' not found.")
+        print("Use --list to see available keys.")
+        exit(1)
+
+    if args.resume:
+        experiment_dir = Path("data") / args.experiment
+        partial_file, exp_run, last_iter = auto_resume(experiment_dir)
+
+        warm_start_nft(
+            partial_file=str(partial_file),
+            exp_run=exp_run,
+            last_iter=last_iter,
+            instance=""
+        )
+    else:
+        execute_multiple_runs(
+            **doe[args.experiment],
+            instance="",
+            run_on_serverless=False
+        )
+
