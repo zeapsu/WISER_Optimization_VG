@@ -98,7 +98,7 @@ if __name__ == "__main__":
         
         doe = doe_localsearch['unconstrained']
         # experiments: list[Experiment] = Experiment.read_experiments('1/31bonds/TwoLocal2rep_piby3_kyiv_0.1/')
-        experiments: list[Experiment] = Experiment.read_experiments('1/31bonds/bfcdR3rep_piby3_AerSimulator_0.2/')
+        experiments: list[Experiment] = Experiment.read_experiments('1/31bonds/bfcd3rep_piby3_AerSimulator_0.2/') # change to bfcd
 
         for xp in experiments:
             if xp.has_step4():
