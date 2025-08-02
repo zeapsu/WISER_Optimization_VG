@@ -135,3 +135,4 @@ venv.bak/
 # project-specific ignores
 [0-9]*_*.pkl
 exp*.pkl
+*.qpy
