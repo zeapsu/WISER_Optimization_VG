@@ -133,3 +133,5 @@ venv.bak/
 .stestr/
 
 # project-specific ignores
+[0-9]*_*.pkl
+exp*.pkl
