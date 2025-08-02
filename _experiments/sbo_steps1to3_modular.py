@@ -21,6 +21,24 @@ from src.sbo.src.patterns.building_blocks.step_3 import HardwareExecutor
 from doe import doe
 
 def warm_start_nft(partial_file: str, exp_run: int, last_iter: int, instance: str, max_epoch: int | None = None):
+    """
+    Resumes a partially completed optimization run using a warm-start strategy.
+
+    Loads a previously saved experiment result and the last iteration checkpoint, then continues
+    the optimization from that point. Useful for recovering interrupted runs or refining solutions
+    further with additional epochs.
+
+    Args:
+        partial_file: Path to the main `exp{i}.pkl` file from the initial run.
+        exp_run: Execution index of the experiment (used in filenames).
+        last_iter: Index of the last completed iteration (used to load `{exp_run}_{last_iter}.pkl`).
+        instance: Qiskit runtime instance string for backend access (ignored for local).
+        max_epoch: Optional override for the number of additional training epochs.
+
+    Outputs:
+        Saves:
+        - A new result file named like `exp{i}.1.pkl` with the extended run information.
+    """
 
     with open(partial_file, 'rb') as f:
         data = pkl.load(f)
@@ -105,6 +123,34 @@ def warm_start_nft(partial_file: str, exp_run: int, last_iter: int, instance: st
 def execute_multiple_runs(lp_file: str, experiment_id: str, num_exec: int, ansatz: str, ansatz_params: dict, 
                           theta_initial: str, device: str, instance: str, optimizer: str, max_epoch: int, alpha: float, shots: int,
                           run_on_serverless: bool, theta_threshold: float):
+    """
+    Executes multiple independent optimization runs using a parameterized quantum circuit.
+
+    Each run starts from scratch with the given initial ansatz configuration and optimizer settings.
+    Results are saved as separate `.pkl` files for each execution. Optionally supports local or
+    Qiskit Serverless backends.
+
+    Args:
+        lp_file: Path to the QUBO problem in LP format.
+        experiment_id: Identifier used for organizing outputs.
+        num_exec: Number of independent optimization runs to perform.
+        ansatz: Name of the ansatz circuit (e.g., 'TwoLocal', 'bfcd').
+        ansatz_params: Dictionary of ansatz-specific parameters (e.g., reps, entanglement).
+        theta_initial: Initialization strategy for the circuit parameters (e.g., 'piby3').
+        device: Backend device identifier (e.g., 'AerSimulator', 'ibmq_manila').
+        instance: Cloud instance string for runtime environments (e.g., hub/group/project).
+        optimizer: Optimizer method name (e.g., 'nft', 'cobyla').
+        max_epoch: Number of training epochs to perform.
+        alpha: Learning rate or update coefficient for the optimizer.
+        shots: Number of measurement shots per circuit execution.
+        run_on_serverless: If True, submit jobs via Qiskit Serverless; otherwise use local backend.
+        theta_threshold: Convergence threshold on parameter updates.
+
+    Outputs:
+        Saves:
+        - `exp{i}.pkl` per run with full result
+        - `exp{i}_{j}.pkl` per iteration (optional checkpoints)
+    """
 
     # step 1 PROBLEM MAPPING
     obj_fn, ansatz_, theta_initial_, backend, initial_layout = problem_mapping(lp_file.replace('.lp','-nocplexvars.lp'),
