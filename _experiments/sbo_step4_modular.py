@@ -7,6 +7,8 @@ import sys
 import time
 import numpy as np
 
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from src.sbo.src.optimizer.local_search import repeated_local_search_general
 from src.sbo.src.optimizer.optimization_monitor import uncompress_x, compress_x
 from src.experiment import Experiment
@@ -139,7 +141,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Run local search postprocessing for quantum experiments.")
     parser.add_argument("--experiment", type=str, required=True, help="Experiment key/folder (e.g., '1/31bonds/test').")
-    parser.add_argument("--search-type", type=str, default="unconstrained", help="Which local search config to use.")
+    parser.add_argument("--search-type", type=str, default="unconstrained", help="Which local search config to use: long, fast, unconstrained")
     parser.add_argument("--root", type=str, default=None, help="Project root directory (optional).")
     args = parser.parse_args()
     run_step4(args.experiment, args.search_type, args.root)
