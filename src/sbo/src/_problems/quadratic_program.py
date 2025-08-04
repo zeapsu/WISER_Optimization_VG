@@ -1141,7 +1141,9 @@ class QuadraticProgram:
             QiskitOptimizationError: if there is a non-printable name.
         """
         # pylint: disable=cyclic-import
-        from src._translators.prettyprint import prettyprint
+        # from src._translators.prettyprint import prettyprint
+
+        from src.sbo.src._translators.prettyprint import prettyprint
 
         return prettyprint(self, wrap)
 
