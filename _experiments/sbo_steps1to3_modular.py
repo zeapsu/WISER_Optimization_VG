@@ -301,7 +301,7 @@ if __name__ == "__main__":
         exit(1)
 
     if args.resume:
-        experiment_dir = Path("data") / args.experiment
+        experiment_dir = ROOT / "data" / args.experiment
         partial_file, exp_run, last_iter = auto_resume(experiment_dir)
 
         warm_start_nft(
