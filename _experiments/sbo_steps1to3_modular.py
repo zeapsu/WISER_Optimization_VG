@@ -291,6 +291,17 @@ if __name__ == "__main__":
             print(f" - {key}")
         exit(0)
 
+    if args.resume:
+        experiment_dir = Path("data") / args.experiment
+        partial_file, exp_run, last_iter = auto_resume(experiment_dir)
+
+        warm_start_nft(
+            partial_file=str(partial_file),
+            exp_run=exp_run,
+            last_iter=last_iter,
+            instance=""
+        )
+
     if not args.experiment:
         print("No experiment provided. Use --experiment <key> or --list.")
         exit(1)
