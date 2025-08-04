@@ -23,7 +23,7 @@ doe_QAOA_common = {
     'max_epoch': 4,
     'shots': 2**13,
     'theta_threshold': 0.,
-}
+    }
 
 doe_bfcd_common = {
     'lp_file': f'{ROOT}/data/1/31bonds/docplex-bin-avgonly.lp',
@@ -203,6 +203,7 @@ doe = {
             'experiment_id': 'QAOA_3rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 3},
             'alpha': 0.2,
+        },
 
     # BFCD
     '1/31bonds/bfcd1rep_piby3_AerSimulator_0.1':
