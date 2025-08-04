@@ -13,6 +13,18 @@ doe_twolocal_common = {
     'theta_threshold': 0.,
     }
 
+doe_QAOA_common = {
+    'lp_file': f'{ROOT}/data/1/31bonds/docplex-bin-avgonly.lp',
+    'num_exec': 10,
+    'ansatz': 'QAOA',
+    'theta_initial': 'piby3',
+    'optimizer': 'nft',
+    'device':'AerSimulator',
+    'max_epoch': 4,
+    'shots': 2**13,
+    'theta_threshold': 0.,
+}
+
 doe_bfcd_common = {
     'lp_file': f'{ROOT}/data/1/31bonds/docplex-bin-avgonly.lp',
     'num_exec': 10,
@@ -138,6 +150,60 @@ doe = {
             'alpha': 0.2,
             },
     
+    # QAOA
+    '1/31bonds/QAOA_1rep_AerSimulator_0.1':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA1rep_AerSimulator_0.1',
+            'ansatz_params': {'reps': 1},
+            'alpha': 0.1,
+            },
+    '1/31bonds/QAOA_2rep_AerSimulator_0.1':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA2rep_AerSimulator_0.1',
+            'ansatz_params': {'reps': 2},
+            'alpha': 0.1,
+            },
+    '1/31bonds/QAOA3rep_AerSimulator_0.1':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_3rep_AerSimulator_0.1',
+            'ansatz_params': {'reps': 3},
+            'alpha': 0.1,
+            },
+    '1/31bonds/QAOA_1rep_AerSimulator_0.15':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_1rep_AerSimulator_0.15',
+            'ansatz_params': {'reps': 1},
+            'alpha': 0.15,
+        },
+    '1/31bonds/QAOA_2rep_AerSimulator_0.15':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_2rep_AerSimulator_0.15',
+            'ansatz_params': {'reps': 2},
+            'alpha': 0.15,
+        },
+    '1/31bonds/QAOA_3rep_AerSimulator_0.15':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_3rep_AerSimulator_0.15',
+            'ansatz_params': {'reps': 3},
+            'alpha': 0.15,
+        },
+    '1/31bonds/QAOA_1rep_AerSimulator_0.2':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_1rep_AerSimulator_0.2',
+            'ansatz_params': {'reps': 1},
+            'alpha': 0.2,
+        }, 
+    '1/31bonds/QAOA_2rep_AerSimulator_0.2':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_2rep_AerSimulator_0.2',
+            'ansatz_params': {'reps': 2},
+            'alpha': 0.2,
+    '1/31bonds/QAOA_3rep_AerSimulator_0.2':
+        doe_QAOA_common | {
+            'experiment_id': 'QAOA_3rep_AerSimulator_0.2',
+            'ansatz_params': {'reps': 3},
+            'alpha': 0.2,
+
     # BFCD
     '1/31bonds/bfcd1rep_piby3_AerSimulator_0.1':
         doe_bfcd_common | {
