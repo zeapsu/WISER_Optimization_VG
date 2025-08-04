@@ -174,36 +174,37 @@ doe = {
             'experiment_id': 'QAOA_1rep_AerSimulator_0.15',
             'ansatz_params': {'reps': 1},
             'alpha': 0.15,
-        },
+            },
     '1/31bonds/QAOA_2rep_AerSimulator_0.15':
         doe_QAOA_common | {
             'experiment_id': 'QAOA_2rep_AerSimulator_0.15',
             'ansatz_params': {'reps': 2},
             'alpha': 0.15,
-        },
+            },
     '1/31bonds/QAOA_3rep_AerSimulator_0.15':
         doe_QAOA_common | {
             'experiment_id': 'QAOA_3rep_AerSimulator_0.15',
             'ansatz_params': {'reps': 3},
             'alpha': 0.15,
-        },
+            },
     '1/31bonds/QAOA_1rep_AerSimulator_0.2':
         doe_QAOA_common | {
             'experiment_id': 'QAOA_1rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 1},
             'alpha': 0.2,
-        }, 
+            }, 
     '1/31bonds/QAOA_2rep_AerSimulator_0.2':
         doe_QAOA_common | {
             'experiment_id': 'QAOA_2rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 2},
             'alpha': 0.2,
+            },
     '1/31bonds/QAOA_3rep_AerSimulator_0.2':
         doe_QAOA_common | {
             'experiment_id': 'QAOA_3rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 3},
             'alpha': 0.2,
-        },
+            },
 
     # BFCD
     '1/31bonds/bfcd1rep_piby3_AerSimulator_0.1':
