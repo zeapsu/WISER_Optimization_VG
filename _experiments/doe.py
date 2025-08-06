@@ -165,43 +165,43 @@ doe = {
             },
     '1/31bonds/QAOA3rep_AerSimulator_0.1':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_3rep_AerSimulator_0.1',
+            'experiment_id': 'QAOA3rep_AerSimulator_0.1',
             'ansatz_params': {'reps': 3},
             'alpha': 0.1,
             },
     '1/31bonds/QAOA1rep_AerSimulator_0.15':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_1rep_AerSimulator_0.15',
+            'experiment_id': 'QAOA1rep_AerSimulator_0.15',
             'ansatz_params': {'reps': 1},
             'alpha': 0.15,
             },
     '1/31bonds/QAOA2rep_AerSimulator_0.15':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_2rep_AerSimulator_0.15',
+            'experiment_id': 'QAOA2rep_AerSimulator_0.15',
             'ansatz_params': {'reps': 2},
             'alpha': 0.15,
             },
     '1/31bonds/QAOA3rep_AerSimulator_0.15':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_3rep_AerSimulator_0.15',
+            'experiment_id': 'QAOA3rep_AerSimulator_0.15',
             'ansatz_params': {'reps': 3},
             'alpha': 0.15,
             },
     '1/31bonds/QAOA1rep_AerSimulator_0.2':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_1rep_AerSimulator_0.2',
+            'experiment_id': 'QAOA1rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 1},
             'alpha': 0.2,
             }, 
     '1/31bonds/QAOA2rep_AerSimulator_0.2':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_2rep_AerSimulator_0.2',
+            'experiment_id': 'QAOA2rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 2},
             'alpha': 0.2,
             },
     '1/31bonds/QAOA3rep_AerSimulator_0.2':
         doe_QAOA_common | {
-            'experiment_id': 'QAOA_3rep_AerSimulator_0.2',
+            'experiment_id': 'QAOA3rep_AerSimulator_0.2',
             'ansatz_params': {'reps': 3},
             'alpha': 0.2,
             },
