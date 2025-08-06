@@ -308,6 +308,12 @@ def build_ansatz(ansatz: str, ansatz_params: dict, num_qubits: int, backend: Bac
         ansatz_ = NLocal(num_qubits, **ansatz_params_)
         ansatz_.measure_all()
 
+    elif ansatz == 'QAOA':
+        from qiskit.circuit.library import QAOAAnsatz
+        ansatz_ = QAOAAnsatz(cost_operator=ansatz_params['hamiltonian'], reps=ansatz_params.get('reps', 1))
+        ansatz_.measure_all()
+        initial_layout = None
+
     else:
         raise ValueError('unknown ansatz')
     
