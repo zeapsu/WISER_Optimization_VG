@@ -1,6 +1,30 @@
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+def _safe_min_last_k(obj, k=20):
+    """
+    Accepts scalar - or any nested list / ndarray that may contain None/np.nan –
+    and returns the minimum of the *last k* numeric entries.
+    Falls back gracefully if obj can’t be converted directly to float array.
+    """
+    try:
+        flat = np.asarray(obj, dtype=float).ravel()
+    except (TypeError, ValueError):
+        # obj is likely a list-of-lists like [None, [v11,v12,…], …]
+        flat = []
+        for block in obj or []:
+            if block is None:
+                continue
+            if isinstance(block, (list, tuple, np.ndarray)):
+                flat.extend(block)
+            else:
+                flat.append(block)
+        flat = np.asarray(flat, dtype=float)
+
+    flat = flat[~np.isnan(flat)]
+    return np.min(flat[-k:]) if flat.size else np.nan
 
 def analyse_df(df, dim, ax1_ylim=[0,.01]):
     palette = "coolwarm"
@@ -46,14 +70,21 @@ def analyse_df(df, dim, ax1_ylim=[0,.01]):
     # sns.scatterplot(df[df['step3_rel_gap']==0], x='step3_x_hamming_weight', y='step3_rel_gap', marker='x', color='black', legend=None, ax=ax3)
     #plt.title('Simulator: TwoLocal(3 reps), 31 qubits, no local search')
 
-
-
+_best_fx_last_iters = _safe_min_last_k
 
 def analyse_df_step4(df, dim, ax1_ylim=[0,.01], num_iters=20):
     palette = "coolwarm"
     df['step3_is_optimal'] = df['step3_rel_gap'].apply(lambda x: 1 if x==0 else 0)
-    df[f'step4_best_fx_{num_iters}iters'] = df['step4_iter_best_fx'].apply(lambda x: min(x[-num_iters:]))
-    df[f'step4_rel_gap_{num_iters}iters'] = (df[f'step4_best_fx_{num_iters}iters'] - df['refvalue']) / df['refvalue']
+
+    # df[f'step4_best_fx_{num_iters}iters'] = df['step4_iter_best_fx'].apply(lambda x: min(x[-num_iters:]))
+    # df[f'step4_rel_gap_{num_iters}iters'] = (df[f'step4_best_fx_{num_iters}iters'] - df['refvalue']) / df['refvalue']
+    best_col = f'step4_best_fx_{num_iters}iters'
+    gap_col  = f'step4_rel_gap_{num_iters}iters'
+
+    # df[best_col] = df['step4_iter_best_fx'].apply(_best_fx_last_iters, k=num_iters)
+    df[f'step4_best_fx_{num_iters}iters'] = df['step4_iter_best_fx'].apply(_safe_min_last_k, k=num_iters)
+    df[gap_col]  = (df[best_col] - df['refvalue']) / df['refvalue']
+
     df[f'step4_is_optimal_{num_iters}iters'] = df[f'step4_rel_gap_{num_iters}iters'].apply(lambda x: 1 if x==0 else 0)
 
     print('size:', len(df))
@@ -74,7 +105,11 @@ def analyse_df_step4(df, dim, ax1_ylim=[0,.01], num_iters=20):
 def analyse_df_step4_slide(df, dim, ax1_ylim=[0,.006], num_iters=20):
     palette = "coolwarm"
     df['step3_is_optimal'] = df['step3_rel_gap'].apply(lambda x: 1 if x==0 else 0)
-    df[f'step4_best_fx_{num_iters}iters'] = df['step4_iter_best_fx'].apply(lambda x: min(x[-num_iters:]))
+    # df[f'step4_best_fx_{num_iters}iters'] = df['step4_iter_best_fx'].apply(lambda x: min(x[-num_iters:]))
+    df[f'step4_best_fx_{num_iters}iters'] = df['step4_iter_best_fx'].apply(_safe_min_last_k, k=num_iters)
+    best_col = f'step4_best_fx_{num_iters}iters'
+    gap_col  = f'step4_rel_gap_{num_iters}iters'
+    df[gap_col]  = (df[best_col] - df['refvalue']) / df['refvalue']
     df[f'step4_rel_gap_{num_iters}iters'] = (df[f'step4_best_fx_{num_iters}iters'] - df['refvalue']) / df['refvalue']
     df[f'step4_is_optimal_{num_iters}iters'] = df[f'step4_rel_gap_{num_iters}iters'].apply(lambda x: 1 if x==0 else 0)
 

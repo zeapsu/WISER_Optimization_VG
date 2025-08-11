@@ -14,6 +14,7 @@ from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import QiskitRuntimeService
 from qiskit.providers.backend import BackendV2
 from qiskit.transpiler import CouplingMap
+from qiskit.quantum_info import SparsePauliOp, Pauli
 
 import numba
 from numba import jit
@@ -225,6 +226,49 @@ def model_to_obj_sparse_numba(model: docplex.mp.model.Model):
 
 model_to_obj = model_to_obj_sparse_numba
 
+# helper function that builds Ising for unconstrained penalty objective
+def _objective_to_ising(model: docplex.mp.model.Model) -> SparsePauliOp:
+    """
+    Build a cost Hamiltonian H = c + Σ_i h_i Z_i + Σ_{i<j} J_ij Z_i Z_j
+
+    *NO* constraints are included – they are already embedded as a
+    classical penalty inside `model_to_obj_*`.
+    """
+    num = model.number_of_binary_variables
+    z_template = np.zeros(num, dtype=bool)
+
+    paulis, coeffs = [], []
+
+    # -------- linear part  --------
+    for i, var in enumerate(model.iter_binary_vars()):
+        coef = model.objective_expr.linear_part.get_coef(var)
+        if abs(coef) > 1e-12:
+            z = z_template.copy()
+            z[i] = True
+            #  x  = (1 - Z)/2  ⇒  coef * x   →   (-coef/2) Z   + const
+            paulis.append(Pauli((z, z_template)))
+            coeffs.append(-coef / 2)
+
+    # -------- quadratic part  --------
+    for i, vi in enumerate(model.iter_binary_vars()):
+        for j, vj in enumerate(model.iter_binary_vars()):
+            if j <= i:
+                continue
+            coef = model.objective_expr.get_quadratic_coefficient(vi, vj)
+            if abs(coef) > 1e-12:
+                z = z_template.copy()
+                z[i] = z[j] = True
+                #  x_i x_j = (1 - Z_i - Z_j + Z_i Z_j)/4
+                paulis.append(Pauli((z, z_template)))
+                coeffs.append(coef / 4)
+
+    if not paulis:                       # degenerate 0-qubit objective
+        return SparsePauliOp("I", 0.0)
+
+    return SparsePauliOp(paulis, coeffs).simplify(atol=0)
+
+
+
 
 def get_cplex_sol(lp_file: str, obj_fn):
     model: docplex.mp.model.Model = docplex.mp.model_reader.ModelReader.read(lp_file)
@@ -280,7 +324,7 @@ def build_ansatz(ansatz: str, ansatz_params: dict, num_qubits: int, backend: Bac
         ansatz_ = TwoLocal(num_qubits, **ansatz_params_)
         ansatz_.measure_all()
     
-    elif ansatz == 'bfcd' or 'bfcdR':
+    elif ansatz in ('bfcd','bfcdR'):
         qc_params = ParameterVector(name='p',length=2 if ansatz == 'bfcd' else 1)
         entanglement_block = QuantumCircuit(2)
         # Rzy
@@ -310,9 +354,12 @@ def build_ansatz(ansatz: str, ansatz_params: dict, num_qubits: int, backend: Bac
 
     elif ansatz == 'QAOA':
         from qiskit.circuit.library import QAOAAnsatz
-        ansatz_ = QAOAAnsatz(cost_operator=ansatz_params['hamiltonian'], reps=ansatz_params.get('reps', 1))
+        hamiltonian = ansatz_params['hamiltonian']
+        reps = ansatz_params.get('reps', 3)
+        ansatz_ = QAOAAnsatz(cost_operator=hamiltonian, reps=reps)
         ansatz_.measure_all()
         initial_layout = None
+
 
     else:
         raise ValueError('unknown ansatz')
@@ -338,6 +385,7 @@ def get_backend(device: str, instance: str, num_vars: int) -> BackendV2:
 def problem_mapping(lp_file: str, ansatz: str, ansatz_params: dict, theta_initial: str, device: str, instance: str):
     model: docplex.mp.model.Model = docplex.mp.model_reader.ModelReader.read(lp_file)
 
+
     obj_fn = model_to_obj(model)
     num_vars = model.number_of_binary_variables
 
@@ -348,8 +396,18 @@ def problem_mapping(lp_file: str, ansatz: str, ansatz_params: dict, theta_initia
         build_backend = backend
     ansatz_params_ = ansatz_params.copy()
     ansatz_params_.pop('from_backend', None)
-    ansatz_params_.pop('discard_initial_layout', None)
+    ansatz_params_.pop('discard_initial_layout', None) 
+
+    #build the cost hamiltonian if the QAOA ansatz is selected
+    if ansatz == 'QAOA':
+        ansatz_params_['hamiltonian'] = _objective_to_ising(model)
+
     ansatz_, initial_layout = build_ansatz(ansatz, ansatz_params_, num_vars, build_backend)
+    if ansatz == 'QAOA':
+        from qiskit.circuit.library import QAOAAnsatz
+        assert isinstance(ansatz_, QAOAAnsatz), (
+            f"Expected QAOAAnsatz but got {type(ansatz_)}"
+        )
     if ansatz_params.get('discard_initial_layout', False):
         initial_layout = None
 
