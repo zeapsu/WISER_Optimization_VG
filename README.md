@@ -1,6 +1,8 @@
 # **Project Name: Hybrid-QAOA Portfolio Optimizer**
 _WISER & Womanium Challenge 2025_
 
+Team Name: QOptimize
+
 Team Members:
 
 Andry Paez - gst-Si5rZLCtdPsRCXI
