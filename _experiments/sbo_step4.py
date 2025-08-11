@@ -146,18 +146,18 @@ if __name__ == "__main__":
                 if len(fx_best_per_job) == 0:
                     iter_best_fx.append(None)
                     iter_fx_evals.append(None)
-
                     step4_time += proc_time
                     continue
+
+                iter_best_fx.append(min(fx_best_per_job))
 
                 best_iter = np.argmin(fx_best_per_job)
                 if result_best_val is None or fx_best_per_job[best_iter] < result_best_val:
                     result_best_x, result_best_val = x_best_per_job[best_iter], fx_best_per_job[best_iter]
 
-                iter_best_fx.append(fx_best_per_job)
                 iter_fx_evals.append(feval_iter)
-
                 step4_time += proc_time
+
             
             xp.local_search_doe = doe["local_search_doe"]
             xp.step4_time = step4_time

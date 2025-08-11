@@ -1,50 +1,79 @@
-# 1. Challenge Overview:
-Vanguard’s portfolio construction process lies at the heart of its investment strategy, balancing risk, return, and investor preferences across a vast landscape of asset classes and constraints. However, as portfolios grow in complexity—spanning thousands of securities, intricate guardrails, and real-time trading demands—classical optimization tools like GUROBI face growing limitations in speed, scalability, and solution diversity. This challenge explores how sampling-based quantum optimization can be harnessed to overcome these barriers. By leveraging hybrid quantum-classical algorithms and decomposition pipelines, the goal is to prototype a quantum-enhanced solution that can:
+# **Project Name: Hybrid-QAOA Portfolio Optimizer**
+_WISER & Womanium Challenge 2025_
 
-1. 	Efficiently solve high-dimensional, constraint-heavy portfolio optimization problems.
-2. 	Deliver near-optimal asset allocations within tight runtime windows.
-3. 	Scale to real-world use cases like fixed income ETF creation and index tracking.
-4. Preserve critical business metrics such as tracking error, excess return, and risk exposure.
+Team Members:
 
-The project focuses on using binary decision variables and quadratic objectives to simulate realistic trading scenarios. The challenge lies not only in achieving computational gains but also in maintaining interpretability, robustness, and alignment with investment principles. 
+Andry Paez - gst-Si5rZLCtdPsRCXI
 
+---
 
-# 2. Challenge Duration:
- * 4 weeks
- * Teams start working on July 15, 2025
- * Teams submit their challenge solutions on August 10, 2025
+### **1. The Challenge Problem**
 
-# 3. Team Guidelines:
-*	Team size - Maximum 3 participants per team.
-*	All team participants must be enrolled in Womanium WISER Quantum 2025.
-*	Everyone is eligible to participate in this challenge and win Womanium grants.
-*	Best participants get selected for Womanium QSL fellowships with Vanguard.
+Modern portfolio optimization involves solving large-scale integer-quadratic programs with thousands of assets and numerous constraints under stringent intraday time limits. Although state-of-the-art classical solvers such as GUROBI or CPLEX are highly effective, **their performance can degrade unpredictably to non-polynomial runtimes as problem complexity scales**. Consequently, if quantum optimization can offer even a modest constant-factor speedup for these problems, its potential business value is substantial.
 
-# 4. Challenge Tasks/ Deliverables:
-The participants are expected to complete for eligible challenge submission:
+The 31-bond toy instance provided by the challenge organizers is small enough to run on a laptop but complex enough for meaningful benchmarking. It includes:
 
-1)	Review the mathematical formulation provided below, focusing on binary decision variables, linear constraints, and the quadratic objective.
-2)	(necessary to pass the project) Convert the binary optimization problem to a formulation that is compatible with a quantum optimization algorithm. For example, convert the constrained problem to an unconstrained problem.
-3)	(necessary to pass the project) Write a quantum optimization program for handling problems of the type in (2). An example of such an optimization routine which is used in portfolio optimization is the Variational Quantum Eigensolver (see resources below), however you may pursue what you judge to be the best solution.
-4)	(challenge) Solve the optimization problem in (1) using your quantum formulation.
-5)	(challenge subtask) Validate your solution in (4) using a classical optimization routine. Compare the solution quality against the benchmark classical solution in terms of the cost function, and include relevant performance metrics(e.g., convergence of the optimization routine, and scaling properties with problem size).
- 
-Note: No formal presentation is required. Instead, we’ll host a “show-and-tell” style session where each team will walk through their approach and demonstrate their prototype live. This is your opportunity to showcase your thinking, creativity, and results in an informal, interactive format.
+  * 31 **binary** decision variables (i.e., whether to buy or skip each bond)
+  * Over 100 linear side-constraints
+  * A quadratic, risk-adjusted objective function
 
-# 5. Quantum Hardware Credits / Platform:
-*	Participants may use any quantum SDK or platform of their choice.
+This complexity is sufficient to benchmark a hybrid algorithm where the intensive combinatorial search is performed on a quantum processor, while the final fine-tuning is handled by a classical post-processor.
 
-# 6. Judging Criteria:
-Solutions will be evaluated against internal benchmark implementations at Vanguard. Evaluation will be based on:
-*	Speed of the solution
-*	Optimality (as measured by the cost function)
-*	Scalability (problem size handled)
+---
 
-# 7. Resources:
+### **2. Rationale for Building on a Reference Implementation**
 
-*	An example of how VQE can be implemented - https://eric08000800.medium.com/portfolio-optimization-with-variational-quantum-eigensolver-vqe-2-477a0ee4e988
-*	A useful paper on variational Quantum Optimization https://quantum-journal.org/papers/q-2020-04-20-256/?utm_source=researcher_app&utm_medium=referral&utm_campaign=RESR_MRKT_Researcher_inbound
-*	Video recording for project orientation 2025 QUANTUM PROGRAM ❯ Day 7 ❯ Projects Orientation Part 2 - YouTube
+The organizers provided a complete reference pipeline, including the TwoLocal and BFGD ansätze, along with a local search post-processor. Re-implementing every helper function, pre-processing step, and evaluation harness from scratch would have consumed most of the four-week timeframe without advancing the core research.
 
- 
+Therefore, I adopted a pragmatic approach:
 
+  * **Leverage the existing scaffold**, including the directory structure, command-line scripts, and logging conventions.
+  * **Integrate QAOA** as a new ansatz family, using the standard implementation from `qiskit-algorithms` along with its preset transpiler pass manager.
+  * **Expose all new hyperparameters** (such as $\alpha$, `reps`, and local search settings) through the existing Design of Experiments (`doe.py`) framework, ensuring our grid search integrated seamlessly.
+
+This strategy allowed me to focus my efforts on *novel experiments* rather than on developing foundational code.
+
+---
+
+### **3. Summary of Changes**
+
+| \# | Change | Files / Notes |
+|---|---|---|
+| **1** | Pinned dependencies using **Poetry** for reproducibility. | [`pyproject.toml`](./pyproject.toml) |
+| **2** | Added command-line flags for granular control of each step. | `scripts/sbo_steps1to3.py`, `scripts/sbo_step4.py` |
+| **3** | Expanded the [`doe.py`](./_experiments/doe.py) grid search to include **QAOA**. | Parameters: $\alpha \in {0.10, 0.15, 0.20, 0.30}$; `reps` = 1–5 |
+| **4** | Implemented the **QAOA** handler in step 1 of the pipeline. | [`src/step_1.py`](./src/step_1.py): Constructs the `QAOAAnsatz` and appends the measurement layer. |
+| **5** | Created a run logger to track experiment results. | Each run appends a summary row to `qaoa_stats.csv`. |
+| **6** | Developed an analysis notebook for visualizing results. | [`qaoa_portfolio_optimazation_analysis.ipynb`](./_experiments/qaoa_portfolio_optimization_analysis.ipynb): Loads the CSV (or .pkl if you ran the experiments) to render all figures. |
+
+Because the existing `model_to_obj` helper already embeds constraint penalties into the objective function, we could **treat the DOCplex model as a black-box cost oracle** and pass it directly to the local search algorithm.
+
+---
+
+### **4. Headline Results (Median of 100 Seeds)**
+
+| Metric | Pure CPLEX | QAOA (p=3) **before** Local Search | QAOA (p=3) **after** Local Search |
+|---|---|---|---|
+| Median Objective Gap | 0 % | **5.6180 %** | **0.0186 %** |
+| 2-Qubit Depth | – | 49 | 49 |
+
+The quantum stage alone approaches the optimal solution, and the classical bit-flip local search consistently closes the residual gap while requiring only \~20 additional objective evaluations. In effect, we **match the classical optimal value with a circuit depth that is feasible for near-term hardware**.
+
+---
+
+### **5. How to Reproduce the Results**
+
+```bash
+# Clone the repository
+git clone https://github.com/zeapsu/WISER_Optimization_VG 
+cd WISER_Optimization_VG
+
+# Install dependencies in a new virtual environment (ensure poetry is installed)
+poetry install
+
+# Launch the notebook to view results and plots (ensure jupyter is installed)
+jupyter lab qaoa_portfolio_optimization_analysis.ipynb
+```
+
+### **6. Project Presentation Deck**
+[Project Presentation Deck](./Project_Presentation_Deck.pptx)
