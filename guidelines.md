@@ -1,5 +1,5 @@
 # 1. Challenge Overview:
- Sponsor's portfolio construction process lies at the heart of its investment strategy, balancing risk, return, and investor preferences across a vast landscape of asset classes and constraints. However, as portfolios grow in complexity—spanning thousands of securities, intricate guardrails, and real-time trading demands—classical optimization tools like GUROBI face growing limitations in speed, scalability, and solution diversity. This challenge explores how sampling-based quantum optimization can be harnessed to overcome these barriers. By leveraging hybrid quantum-classical algorithms and decomposition pipelines, the goal is to prototype a quantum-enhanced solution that can:
+ Organizers's portfolio construction process lies at the heart of its investment strategy, balancing risk, return, and investor preferences across a vast landscape of asset classes and constraints. However, as portfolios grow in complexity—spanning thousands of securities, intricate guardrails, and real-time trading demands—classical optimization tools like GUROBI face growing limitations in speed, scalability, and solution diversity. This challenge explores how sampling-based quantum optimization can be harnessed to overcome these barriers. By leveraging hybrid quantum-classical algorithms and decomposition pipelines, the goal is to prototype a quantum-enhanced solution that can:
 
 1. 	Efficiently solve high-dimensional, constraint-heavy portfolio optimization problems.
 2. 	Deliver near-optimal asset allocations within tight runtime windows.
@@ -18,7 +18,7 @@ The project focuses on using binary decision variables and quadratic objectives 
 *	Team size - Maximum 3 participants per team.
 *	All team participants must be enrolled in Womanium WISER Quantum 2025.
 *	Everyone is eligible to participate in this challenge and win Womanium grants.
-*	Best participants get selected for Womanium QSL fellowships with Vanguard.
+*	Best participants get selected for Womanium QSL fellowships with Organizer.
 
 # 4. Challenge Tasks/ Deliverables:
 The participants are expected to complete for eligible challenge submission:
@@ -35,7 +35,7 @@ Note: No formal presentation is required. Instead, we’ll host a “show-and-te
 *	Participants may use any quantum SDK or platform of their choice.
 
 # 6. Judging Criteria:
-Solutions will be evaluated against internal benchmark implementations at Sponser. Evaluation will be based on:
+Solutions will be evaluated against internal benchmark implementations at organizer. Evaluation will be based on:
 *	Speed of the solution
 *	Optimality (as measured by the cost function)
 *	Scalability (problem size handled)
